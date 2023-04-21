@@ -10,7 +10,7 @@ axiosclient.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    Alert.alert(error.response.data.message);
+    Alert.alert("Some error occured");
     return Promise.reject(error);
   }
 );

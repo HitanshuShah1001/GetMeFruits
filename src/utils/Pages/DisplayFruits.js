@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
 import { axiosclient } from "../AxiosClient";
 import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 import { styles } from "./styles";
+import { useNavigation } from "@react-navigation/native";
 
 export function DisplayFruits() {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [fruits, setFruits] = useState([]);
   const [fruit, setFruit] = useState("");
@@ -37,7 +39,7 @@ export function DisplayFruits() {
       style={{
         flex: 1,
         backgroundColor: "white",
-        paddingVertical: 50,
+        paddingVertical: 20,
         alignItems: "center",
       }}
     >
@@ -132,6 +134,31 @@ export function DisplayFruits() {
           </View>
         );
       })}
+      {selectedsubtypestosend.length !== 0 && (
+        <TouchableOpacity
+          style={{
+            alignSelf: "center",
+            width: "30%",
+            height: 40,
+            backgroundColor: "black",
+            marginTop: 30,
+            borderRadius: 13,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          onPress={() =>
+            navigation.navigate("Confirm-Order", {
+              fruitname: fruit.name,
+              id: fruit._id,
+              subtypes: selectedsubtypestosend,
+            })
+          }
+        >
+          <Text style={{ color: "white", fontSize: 18, fontWeight: "500" }}>
+            Checkout
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
