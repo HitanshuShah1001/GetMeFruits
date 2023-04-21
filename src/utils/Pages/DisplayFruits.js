@@ -106,18 +106,27 @@ export function DisplayFruits() {
               <Text>{indsubtype.name}</Text>
               <Text>Available Boxes :- {indsubtype.availableBoxes}</Text>
             </View>
-            <View style={{ justifyContent: "center" }}>
+            <View
+              style={{
+                justifyContent: "center",
+                width: "80%",
+                alignItems: "center",
+              }}
+            >
               <TextInput
                 value={indsubtype?.boxes}
                 onChangeText={(val) => (indsubtype.boxes = val)}
                 style={{
-                  width: 100,
+                  width: "50%",
                   backgroundColor: "black",
                   color: "white",
                   paddingHorizontal: 10,
                   height: 30,
                   borderRadius: 13,
+                  textAlign: "center",
                 }}
+                placeholder="Enter quantity"
+                placeholderTextColor={"white"}
               />
             </View>
           </View>
