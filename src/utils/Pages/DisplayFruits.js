@@ -15,6 +15,7 @@ export function DisplayFruits() {
   const [selectedsubtypes, setSelectedsubtypes] = useState([]);
   const [selectedsubtypestosend, setSelectedsubtypestosend] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [totalprice, setTotalprice] = useState();
   useEffect(() => {
     setLoading(true);
     axiosclient
@@ -30,10 +31,12 @@ export function DisplayFruits() {
     setSelectedsubtypestosend(temp);
   };
 
-  useEffect(() => {
-    console.log(selectedsubtypestosend);
-  }, [selectedsubtypestosend]);
-
+  const changePrice = (indsubtype, val) => {
+    setTotalprice(
+      (totalprice) =>
+        totalprice + parseFloat(indsubtype.pricePerBox) * parseFloat(val)
+    );
+  };
   return (
     <View
       style={{
@@ -96,7 +99,7 @@ export function DisplayFruits() {
               flexDirection: "row",
               justifyContent: "space-between",
               paddingHorizontal: 10,
-              height: 50,
+
               alignItems: "center",
               marginTop: 20,
               backgroundColor: "yellow",
@@ -104,9 +107,10 @@ export function DisplayFruits() {
             }}
             key={index}
           >
-            <View>
+            <View style={{ marginVertical: 10 }}>
               <Text>{indsubtype.name}</Text>
               <Text>Available Boxes :- {indsubtype.availableBoxes}</Text>
+              <Text>Price per box :- {indsubtype.pricePerBox}</Text>
             </View>
             <View
               style={{
@@ -117,7 +121,10 @@ export function DisplayFruits() {
             >
               <TextInput
                 value={indsubtype?.boxes}
-                onChangeText={(val) => (indsubtype.boxes = val)}
+                onChangeText={(val) => {
+                  console.log(val, ":val");
+                  indsubtype.boxes = val;
+                }}
                 style={{
                   width: "50%",
                   backgroundColor: "black",
@@ -134,6 +141,7 @@ export function DisplayFruits() {
           </View>
         );
       })}
+      <Text>Total cost is {totalprice}</Text>
       {selectedsubtypestosend.length !== 0 && (
         <TouchableOpacity
           style={{
