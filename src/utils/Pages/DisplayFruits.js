@@ -3,7 +3,7 @@ import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
 import { axiosclient } from "../AxiosClient";
 import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 import { styles } from "./styles";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 
 export function DisplayFruits() {
   const navigation = useNavigation();
@@ -14,9 +14,14 @@ export function DisplayFruits() {
   const [subtypes, setSubtypes] = useState([]);
   const [selectedsubtypes, setSelectedsubtypes] = useState([]);
   const [selectedsubtypestosend, setSelectedsubtypestosend] = useState([]);
-  const [refresh, setRefresh] = useState(false);
+  const [enablecheckout, setEnablecheckout] = useState(false);
   const [totalprice, setTotalprice] = useState();
+  const focused = useIsFocused();
   useEffect(() => {
+    setFruits([]);
+    setSelectedsubtypes([]);
+    setSelectedsubtypestosend([]);
+    setSubtypes([]);
     setLoading(true);
     axiosclient
       .get("/fruit/list")
@@ -24,7 +29,7 @@ export function DisplayFruits() {
         setFruits(res.fruits);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [focused]);
 
   const updatedsubtypestosend = (item) => {
     let temp = subtypes.filter((subtype) => item.includes(subtype.name));
@@ -115,18 +120,18 @@ export function DisplayFruits() {
             <View
               style={{
                 justifyContent: "center",
-                width: "80%",
+                width: "50%",
                 alignItems: "center",
               }}
             >
               <TextInput
                 value={indsubtype?.boxes}
                 onChangeText={(val) => {
-                  console.log(val, ":val");
                   indsubtype.boxes = val;
                 }}
+                keyboardType="number-pad"
                 style={{
-                  width: "50%",
+                  width: "90%",
                   backgroundColor: "black",
                   color: "white",
                   paddingHorizontal: 10,
@@ -141,7 +146,7 @@ export function DisplayFruits() {
           </View>
         );
       })}
-      <Text>Total cost is {totalprice}</Text>
+
       {selectedsubtypestosend.length !== 0 && (
         <TouchableOpacity
           style={{

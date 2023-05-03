@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 import { Alert } from "react-native/";
 
 export const axiosclient: AxiosInstance = axios.create({
-  baseURL: `http://localhost:4000`,
+  baseURL: `https://fruitmanagement.herokuapp.com`,
 });
 
 axiosclient.interceptors.response.use(
@@ -10,7 +10,8 @@ axiosclient.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    Alert.alert("Some error occured");
+    Alert.alert(error?.response?.data?.error);
+
     return Promise.reject(error);
   }
 );

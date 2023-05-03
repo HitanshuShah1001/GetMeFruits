@@ -3,18 +3,25 @@ import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 import Phone from "react-native-phone-number-input";
 import { axiosclient } from "../AxiosClient";
 import { useNavigation } from "@react-navigation/native";
+import { Emailtest } from "../Emailregextest";
+import { ValidationCheckData } from "../ValidationCheckdata";
 
 export default function CompleteOrder(props) {
-  console.log(props.route.params, "paramsss");
   const navigation = useNavigation();
   const { id, fruitname, subtypes } = props.route.params;
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [newsubtypes, setNewsbtypes] = useState([]);
   const phoneInput = useRef(null);
-  const Order = async () => {
-    let newsubtypes = [];
+
+  useEffect(() => {
+    RemoveUnncessaryfields();
+  }, []);
+
+  const RemoveUnncessaryfields = () => {
+    let modifiedsubtypes = [];
     for (let fruitobject of subtypes) {
       let temp = {};
       for (let key of Object.keys(fruitobject)) {
@@ -26,23 +33,35 @@ export default function CompleteOrder(props) {
           }
         }
       }
-      newsubtypes.push(temp);
+      modifiedsubtypes.push(temp);
     }
-
+    setNewsbtypes(modifiedsubtypes);
+  };
+  const Order = async () => {
     let body = {
       name,
       address,
-      email,
       fruit: {
         name: fruitname,
         subTypes: newsubtypes,
       },
     };
-    console.log(body, id);
-    axiosclient.post(`/order/${id}`, body).then((res) => {
-      Alert.alert("Order placed succesfully");
-      navigation.goBack();
-    });
+    if (email) {
+      body.email = email;
+    }
+    if (phone) {
+      body.phone = phone;
+    }
+    let willreceive = email ? `email` : "sms";
+    if (ValidationCheckData({ phone, email, name, address })) {
+      axiosclient.post(`/order/${id}`, body).then((res) => {
+        Alert.alert(
+          `Order placed succesfully,You will receive an ${willreceive} with the details`
+        );
+
+        navigation.goBack();
+      });
+    }
   };
 
   return (
