@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { axiosclient } from "../AxiosClient";
 import { Dropdown, MultiSelect } from "react-native-element-dropdown";
 import { styles } from "./styles";
@@ -96,6 +103,7 @@ export function DisplayFruits() {
       )}
 
       {selectedsubtypestosend.map((indsubtype, index) => {
+        console.log(indsubtype, "indsubtype");
         return (
           <View
             style={{
@@ -114,13 +122,21 @@ export function DisplayFruits() {
           >
             <View style={{ marginVertical: 10 }}>
               <Text>{indsubtype.name}</Text>
-              <Text>Available Boxes :- {indsubtype.availableBoxes}</Text>
-              <Text>Price per box :- {indsubtype.pricePerBox}</Text>
+              <Text>Available Boxes {indsubtype.availableBoxes}</Text>
+              <Text>Price per box {indsubtype.pricePerBox}</Text>
+            </View>
+            <View>
+              <Image
+                source={{
+                  uri: `https://fruitmanagement.herokuapp.com/${indsubtype.imageUrl}`,
+                }}
+                style={{ height: 40, width: 40, borderRadius: 12 }}
+              />
             </View>
             <View
               style={{
                 justifyContent: "center",
-                width: "50%",
+                width: "40%",
                 alignItems: "center",
               }}
             >
