@@ -1,193 +1,203 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import { axiosclient } from "../AxiosClient";
-import { Dropdown, MultiSelect } from "react-native-element-dropdown";
-import { styles } from "./styles";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
+/* eslint-disable react/jsx-no-comment-textnodes */
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { Text, View, Image, TextInput, ScrollView } from "react-native";
+import Phone from "react-native-phone-number-input";
+import { ValidationCheckData } from "../ValidationCheckdata";
+import { styles } from "./displayfruitstyles";
+import { LinearGradient } from "expo-linear-gradient";
+import Box from "./Box";
+import Checkout from "./Checkout";
 
-export function DisplayFruits() {
-  const navigation = useNavigation();
-  const [loading, setLoading] = useState(false);
+export default function DisplayFruits() {
+  const [fruitname, setFruitName] = useState("");
+
   const [fruits, setFruits] = useState([]);
-  const [fruit, setFruit] = useState("");
-  const [isFocus, setIsFocus] = useState(false);
-  const [subtypes, setSubtypes] = useState([]);
-  const [selectedsubtypes, setSelectedsubtypes] = useState([]);
-  const [selectedsubtypestosend, setSelectedsubtypestosend] = useState([]);
-  const [enablecheckout, setEnablecheckout] = useState(false);
-  const [totalprice, setTotalprice] = useState();
-  const focused = useIsFocused();
-  useEffect(() => {
-    setFruits([]);
-    setSelectedsubtypes([]);
-    setSelectedsubtypestosend([]);
-    setSubtypes([]);
-    setLoading(true);
-    axiosclient
-      .get("/fruit/list")
-      .then((res) => {
-        setFruits(res.fruits);
-      })
-      .finally(() => setLoading(false));
-  }, [focused]);
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [name, setName] = useState("");
+  const [id, setId] = useState("");
+  const [newsubtypes, setNewsbtypes] = useState([]);
+  const [orderplaced, setOrderplaced] = useState(false);
+  const [loadingfruit, setLoadingfruit] = useState(false);
+  const phoneInput = useRef(null);
 
-  const updatedsubtypestosend = (item) => {
-    let temp = subtypes.filter((subtype) => item.includes(subtype.name));
-    setSelectedsubtypestosend(temp);
-  };
-
-  const changePrice = (indsubtype, val) => {
-    setTotalprice(
-      (totalprice) =>
-        totalprice + parseFloat(indsubtype.pricePerBox) * parseFloat(val)
-    );
-  };
-  return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "white",
-        paddingVertical: 20,
-        alignItems: "center",
-      }}
-    >
-      <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-        selectedTextStyle={styles.selectedTextStyle}
-        data={fruits}
-        maxHeight={300}
-        placeholder={"Select Fruit"}
-        searchPlaceholder="Search..."
-        labelField="name"
-        valueField="name"
-        value={fruit}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={(item) => {
-          setSubtypes(item?.subTypes);
-          setFruit(item);
-          setSelectedsubtypestosend([]);
-          setSelectedsubtypes([]);
-        }}
-      />
-      {subtypes.length !== 0 && (
-        <MultiSelect
-          style={[
-            styles.dropdown,
-            isFocus && { borderColor: "blue" },
-            { marginTop: 20 },
-          ]}
-          search
-          selectedTextStyle={styles.selectedTextStyle}
-          data={subtypes}
-          maxHeight={300}
-          placeholder={"Select Subtypes"}
-          searchPlaceholder="Search..."
-          labelField="name"
-          valueField="name"
-          value={selectedsubtypes}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={(item) => {
-            setSelectedsubtypes(item);
-            updatedsubtypestosend(item);
-          }}
-        />
-      )}
-
-      {selectedsubtypestosend.map((indsubtype, index) => {
-        console.log(indsubtype, "indsubtype");
-        return (
-          <View
-            style={{
-              width: "95%",
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              paddingHorizontal: 10,
-
-              alignItems: "center",
-              marginTop: 20,
-              backgroundColor: "yellow",
-              borderRadius: 15,
-            }}
-            key={index}
-          >
-            <View style={{ marginVertical: 10 }}>
-              <Text>{indsubtype.name}</Text>
-              <Text>Available Boxes {indsubtype.availableBoxes}</Text>
-              <Text>Price per box {indsubtype.pricePerBox}</Text>
-            </View>
-            <View>
-              <Image
-                source={{
-                  uri: `https://fruitmanagement.herokuapp.com/${indsubtype.imageUrl}`,
-                }}
-                style={{ height: 40, width: 40, borderRadius: 12 }}
-              />
-            </View>
-            <View
-              style={{
-                justifyContent: "center",
-                width: "40%",
-                alignItems: "center",
-              }}
-            >
-              <TextInput
-                value={indsubtype?.boxes}
-                onChangeText={(val) => {
-                  indsubtype.boxes = val;
-                }}
-                keyboardType="number-pad"
-                style={{
-                  width: "90%",
-                  backgroundColor: "black",
-                  color: "white",
-                  paddingHorizontal: 10,
-                  height: 30,
-                  borderRadius: 13,
-                  textAlign: "center",
-                }}
-                placeholder="Enter quantity"
-                placeholderTextColor={"white"}
-              />
-            </View>
-          </View>
-        );
-      })}
-
-      {selectedsubtypestosend.length !== 0 && (
-        <TouchableOpacity
-          style={{
-            alignSelf: "center",
-            width: "30%",
-            height: 40,
-            backgroundColor: "black",
-            marginTop: 30,
-            borderRadius: 13,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          onPress={() =>
-            navigation.navigate("Confirm-Order", {
-              fruitname: fruit.name,
-              id: fruit._id,
-              subtypes: selectedsubtypestosend,
-            })
+  function promisifiedFunction(subtypes) {
+    return new Promise((resolve, reject) => {
+      let modifiedsubtypes = [];
+      try {
+        for (let fruitobject of subtypes) {
+          let temp = {};
+          for (let key of Object.keys(fruitobject)) {
+            if (fruitobject["boxes"] !== "") {
+              if (["name", "_id", "boxes"].includes(key)) {
+                if (key === "_id") {
+                  temp["id"] = fruitobject[key];
+                } else {
+                  temp[key] = fruitobject[key];
+                }
+              }
+            } else {
+              break;
+            }
           }
-        >
-          <Text style={{ color: "white", fontSize: 18, fontWeight: "500" }}>
-            Checkout
-          </Text>
-        </TouchableOpacity>
-      )}
-    </View>
+
+          if (Object.keys(temp).length > 0) {
+            modifiedsubtypes.push(temp);
+          }
+        }
+        resolve(modifiedsubtypes);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  const addPropertyToArray = (subTypes) => {
+    return new Promise((resolve, reject) => {
+      let arr = [];
+      try {
+        subTypes.map((subType) => {
+          arr.push({ ...subType, boxes: "" });
+        });
+        resolve(arr);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
+
+  const Order = async () => {
+    promisifiedFunction(newsubtypes).then((modifiedsubtypes) => {
+      if (modifiedsubtypes.length > 0) {
+        let body = {
+          name,
+          address,
+          fruit: {
+            name: fruitname,
+            subTypes: modifiedsubtypes,
+          },
+        };
+        if (email) {
+          body.email = email;
+        }
+        if (phone) {
+          body.phone = phone;
+        }
+        let willreceive = email ? `email` : "sms";
+        if (ValidationCheckData({ phone, email, name, address })) {
+          axios
+            .post(`https://fruitmanagement.herokuapp.com/order/${id}`, body)
+            .then((res) => {
+              alert(
+                `Order placed succesfully,You will receive an ${willreceive} with the details`
+              );
+              setName("");
+              setFruitName("");
+              setAddress("");
+              setEmail("");
+              setPhone("");
+
+              setFruits([]);
+
+              setOrderplaced(!orderplaced);
+            })
+            .catch((e) => {
+              console.log(e.response.data.error);
+              alert(e?.response?.data?.error);
+            });
+        }
+      }
+    });
+  };
+
+  useEffect(() => {
+    setLoadingfruit(true);
+    axios
+      .get("https://fruitmanagement.herokuapp.com/fruit/list")
+      .then((response) => {
+        setFruitName(response.data.fruits[0].name);
+        setFruits(response.data.fruits);
+        setId(response.data.fruits[0]._id);
+        addPropertyToArray(response?.data?.fruits[0]?.subTypes).then((arr) =>
+          setNewsbtypes(arr)
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setLoadingfruit(false);
+      });
+  }, [orderplaced]);
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <LinearGradient
+        style={{ flex: 1 }}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        colors={["#c2e59c", "#64b3f4"]}
+      >
+        {fruits.map((fruit) => (
+          <>
+            <Text style={styles.header}>{fruit.name}</Text>
+            <View style={styles.subtypecontainer}>
+              {newsubtypes.map((subtype, index) => {
+                return (
+                  <View style={styles.subtypecontainerwithimage} key={index}>
+                    <Image
+                      source={{
+                        uri: `https://fruitmanagement.herokuapp.com/${subtype.imageUrl}`,
+                      }}
+                      style={{ borderRadius: 10 }}
+                      height={150}
+                      width={"100%"}
+                    />
+                    <Box subtype={subtype} />
+                    <TextInput
+                      onChangeText={(val) => (subtype.boxes = val)}
+                      placeholder="Enter quantity"
+                      style={styles.input}
+                    />
+                  </View>
+                );
+              })}
+            </View>
+          </>
+        ))}
+        <View style={{ alignItems: "center", marginTop: 17 }}>
+          <TextInput
+            onChangeText={(val) => setName(val)}
+            placeholder="Enter Name"
+            value={name}
+            style={styles.input}
+          />
+          <TextInput
+            onChangeText={(val) => setAddress(val)}
+            placeholder="Enter Address"
+            style={styles.input}
+          />
+          <TextInput
+            onChangeText={(val) => setEmail(val)}
+            placeholder="Enter Email"
+            style={styles.input}
+          />
+          <Phone
+            ref={phoneInput}
+            defaultValue={phone}
+            defaultCode={"CY"}
+            layout="first"
+            onChangeFormattedText={(text) => {
+              setPhone(text);
+            }}
+            containerStyle={{ marginTop: 20 }}
+          />
+
+          <Checkout onClick={() => Order()} />
+        </View>
+      </LinearGradient>
+    </ScrollView>
   );
 }
