@@ -133,13 +133,19 @@ export default function DisplayFruits() {
   }, [orderplaced]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <LinearGradient
+    <LinearGradient
+      style={{ flex: 1 }}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      colors={["#c2e59c", "#64b3f4"]}
+    >
+      <ScrollView>
+        {/* <LinearGradient
         style={{ flex: 1 }}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         colors={["#c2e59c", "#64b3f4"]}
-      >
+      > */}
         {fruits.map((fruit) => (
           <>
             <Text style={styles.header}>{fruit.name}</Text>
@@ -159,7 +165,7 @@ export default function DisplayFruits() {
                     <TextInput
                       onChangeText={(val) => (subtype.boxes = val)}
                       placeholder="Enter quantity"
-                      style={styles.input}
+                      style={[styles.input, { color: "black" }]}
                     />
                   </View>
                 );
@@ -197,7 +203,7 @@ export default function DisplayFruits() {
 
           <Checkout onClick={() => Order()} />
         </View>
-      </LinearGradient>
-    </ScrollView>
+      </ScrollView>
+    </LinearGradient>
   );
 }
