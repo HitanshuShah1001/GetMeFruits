@@ -134,9 +134,8 @@ export default function DisplayFruits() {
     axios
       .get("https://fruitmanagement.herokuapp.com/fruit/list")
       .then((response) => {
-        console.log("fruits");
         setFruitName(response.data.fruits[0].name);
-        setFruits(response.data.fruits);
+        setFruits([response.data.fruits[0]]);
         setId(response.data.fruits[0]._id);
         addPropertyToArray(response?.data?.fruits[0]?.subTypes).then((arr) =>
           setNewsbtypes(arr)
@@ -163,7 +162,7 @@ export default function DisplayFruits() {
     >
       {!loadingfruit ? (
         <ScrollView>
-          {fruits.map((fruit) => (
+          {fruits?.map((fruit) => (
             <>
               <Text style={styles.header}>{fruit.name}</Text>
               <View style={styles.subtypecontainer}>
