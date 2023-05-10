@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { AppState } from "react-native";
 import { Text, View, Image, TextInput, ScrollView } from "react-native";
 import Phone from "react-native-phone-number-input";
 import { ValidationCheckData } from "../ValidationCheckdata";
@@ -23,6 +24,22 @@ export default function DisplayFruits() {
   const [loadingfruit, setLoadingfruit] = useState(false);
   const phoneInput = useRef(null);
 
+  useEffect(() => {
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
+  const handleAppStateChange = (nextAppState) => {
+    console.log("here", nextAppState);
+    if (nextAppState === "active") {
+      getFruits();
+    }
+  };
   function promisifiedFunction(subtypes) {
     return new Promise((resolve, reject) => {
       let modifiedsubtypes = [];
@@ -112,8 +129,7 @@ export default function DisplayFruits() {
     });
   };
 
-  useEffect(() => {
-    setLoadingfruit(true);
+  const getFruits = () => {
     axios
       .get("https://fruitmanagement.herokuapp.com/fruit/list")
       .then((response) => {
@@ -130,6 +146,10 @@ export default function DisplayFruits() {
       .finally(() => {
         setLoadingfruit(false);
       });
+  };
+  useEffect(() => {
+    setLoadingfruit(true);
+    getFruits();
   }, [orderplaced]);
 
   return (

@@ -59,6 +59,7 @@ export const styles = StyleSheet.create({
     borderRadius: 13,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 25,
   },
 
   checkouttext: { color: "white", fontSize: 18, fontWeight: "500" },
